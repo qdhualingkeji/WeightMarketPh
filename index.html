@@ -7,11 +7,22 @@
 <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
 <script type="text/javascript">
 var path="http://192.168.2.166:8080/WeightMarket/phone/chenQi/";
+var gpuSmInterval,gpuMmtInterval,zxcykhMmtInterval;
+//以下这块代码是防止打开其他窗口时，定时器仍在运行导致滚字幕加速。打开其他窗口时，必须暂停计时器，等切换回来再启动计时器
+//参考链接：https://www.imooc.com/article/39384?block_id=tuijian_wz
+document.onvisibilitychange=function(){   
+	if(document.visibilityState=="visible"){//启动计时器
+		gpuSmInterval=setInterval("moveGPUItemDiv()","3000");
+	}
+	else{//停止计时器
+		clearInterval(gpuSmInterval);
+	} 
+}
+
 $(function(){
-	//gpuSmInterval=setInterval("moveGPUItemDiv()","3000");
+	gpuSmInterval=setInterval("moveGPUItemDiv()","3000");
 	initPnListDiv();
-	//initSystemInfo();
-	//setTimeout("showNewBridge(false)","1000");//一开始隐藏百度商桥，等点击在线咨询后才显示。因为百度商桥是延迟加载的，必须等一秒后才隐藏
+	setTimeout("showNewBridge(false)","1000");//一开始隐藏百度商桥，等点击在线咨询后才显示。因为百度商桥是延迟加载的，必须等一秒后才隐藏
 });
 
 function initPnListDiv(){
@@ -136,6 +147,158 @@ function initSystemInfo(){
 			}
 		}
 	});
+}
+
+function showXXSQYSZCDiv(show){
+	$("#xxsqyszc_bg_div").css("display",show?"block":"none");
+}
+
+//将获取报价客户列表里的第一项移动到最后一项，实现列表刷新
+function refreshGPU(){
+	var gpuListDiv=$("#gpu_list_div");
+	var itemDiv=gpuListDiv.find(".item_div").eq(0);
+	gpuListDiv.append(itemDiv);
+}
+
+function moveGPUItemDiv(){
+	var gpuListDiv=$("#gpu_list_div");
+	var itemDiv=gpuListDiv.find(".item_div").eq(0);
+	gpuMmtInterval=setInterval(function(){
+		var marginTop=itemDiv.css("margin-top");
+		marginTop=marginTop.substring(0,marginTop.length-2);
+		//console.log(marginTop);
+		marginTop--;
+		itemDiv.css("margin-top",marginTop+"px");
+		if(marginTop<=-33){
+			clearInterval(gpuMmtInterval);
+			refreshGPU();
+			itemDiv.css("margin-top","0px");
+		}
+	},"10");
+}
+
+function checkGetPriceUserInfo(){
+	if(checkGetPriceUserName()){
+		if(checkGetPricePhone()){
+			if(checkProductNeedId()){
+				addGetPriceUser();
+			}
+		}
+	}
+}
+
+function addGetPriceUser(){
+	var userName=$("#get_price_div #userName").val();
+	var phone=$("#get_price_div #phone").val();
+	var radChecked=$("input[id^='pn_rad']:checked");
+	var radId=radChecked.attr("id");
+	var pnId=radId.substring(6,radId.length);
+	$.post("addGetPriceUser",
+		{userName:userName,phone:phone,pnId:pnId},
+		function(result){
+			showAGPUWarnDiv(result.status==1?true:false,result.msg);
+		}
+	,"json");
+}
+
+function checkGetPriceUserName(){
+	var userName=$("#get_price_div #userName").val();
+	if(userName==null||userName==""){
+		showUserNameWarnDiv(true);
+    	return false;
+	}
+	else
+		return true;
+}
+
+function checkGetPricePhone(){
+	var phone=$("#get_price_div #phone").val();
+	if(phone==null||phone==""){
+		showPhoneWarnDiv(true);
+    	return false;
+	}
+	else
+		return true;
+}
+
+function checkProductNeedId(){
+	var radChecked=$("input[id^='pn_rad']:checked");
+	if(radChecked.length==0){
+		showPNWarnDiv(true);
+    	return false;
+	}
+	else{
+		return true;
+	}
+}
+
+function showUserNameWarnDiv(show){
+	if(show){
+		$("#userName_warn_bg_div").css("display","block");
+		setTimeout("showUserNameWarnDiv(false)","3000");
+	}
+	else{
+		$("#userName_warn_bg_div").css("display","none");
+	}
+}
+
+function showPhoneWarnDiv(show){
+	if(show){
+		$("#phone_warn_bg_div").css("display","block");
+		setTimeout("showPhoneWarnDiv(false)","3000");
+	}
+	else{
+		$("#phone_warn_bg_div").css("display","none");
+	}
+}
+
+function showPNWarnDiv(show){
+	if(show){
+		$("#pn_warn_bg_div").css("display","block");
+		setTimeout("showPNWarnDiv(false)","3000");
+	}
+	else{
+		$("#pn_warn_bg_div").css("display","none");
+	}
+}
+
+function showAGPUWarnDiv(show,msg){
+	if(show){
+		$("#agpu_warn_bg_div").css("display","block");
+		$("#agpu_warn_div").text(msg);
+		setTimeout("showAGPUWarnDiv(false)","3000");
+	}
+	else{
+		$("#agpu_warn_bg_div").css("display","none");
+		$("#agpu_warn_div").text("");
+	}
+}
+
+function showNewBridge(show){
+	$("#newBridge").css("display",show?"block":"none");
+}
+
+var _hmt = _hmt || [];
+(function() {
+	var hm = document.createElement('script');
+	hm.src = '//hm.baidu.com/hm.js?2d58e7ee2c6bd4eb74b0893c5a3a92a4';
+	var s = document.getElementsByTagName('script')[0];
+	s.parentNode.insertBefore(hm, s);
+})();
+
+function openChatDialog(){
+	//https://blog.csdn.net/p445098355/article/details/104272962
+    var system ={};  
+	var p = navigator.platform;       
+	system.win = p.indexOf("Win") == 0;  
+	system.mac = p.indexOf("Mac") == 0;  
+	system.x11 = (p == "X11") || (p.indexOf("Linux") == 0);     
+	if(system.win||system.mac||system.xll){//如果是电脑跳转到
+	   $("ins[data-id='313568']").click();
+	}
+	else{//如果是手机,跳转到
+	   $("ins[id='nb_invite_ok']").click();
+	}
 }
 </script>
 <title>辰麒智能门禁称重系统</title>
