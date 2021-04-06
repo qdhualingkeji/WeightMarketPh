@@ -193,12 +193,17 @@ function addGetPriceUser(){
 	var radChecked=$("input[id^='pn_rad']:checked");
 	var radId=radChecked.attr("id");
 	var pnId=radId.substring(6,radId.length);
-	$.post("addGetPriceUser",
-		{userName:userName,phone:phone,pnId:pnId},
-		function(result){
+	$.ajax({
+		url:path+"addGetPriceUser",
+		data:{userName:userName,phone:phone,pnId:pnId},
+		dataType:"jsonp",
+		type: "post",
+		jsonpCallback:"jsonpCallback",
+		success:function(res){
+			var result=JSON.parse(res);
 			showAGPUWarnDiv(result.status==1?true:false,result.msg);
 		}
-	,"json");
+	});
 }
 
 function checkGetPriceUserName(){
