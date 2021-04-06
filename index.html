@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+ <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" href="css/index.css"/>
+<script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+<script type="text/javascript">
+var path="http://192.168.2.166:8080/WeightMarket/phone/chenQi/";
+$(function(){
+	//gpuSmInterval=setInterval("moveGPUItemDiv()","3000");
+	initPnListDiv();
+	//initSystemInfo();
+	//setTimeout("showNewBridge(false)","1000");//一开始隐藏百度商桥，等点击在线咨询后才显示。因为百度商桥是延迟加载的，必须等一秒后才隐藏
+});
+
+function initPnListDiv(){
+	$.ajax({
+		url:path+"selectProdNeedList",
+		dataType:"jsonp",
+		type: "post",
+		jsonpCallback:"jsonpCallback",
+		success:function(res){
+			var result=JSON.parse(res);
+			var pnListDiv=$("#pn_list_div");
+			pnListDiv.empty();
+			if(result.message=="ok"){
+				var pnList=result.data;
+				var pnLength=pnList.length;
+				for(var i=0;i<pnLength;i++){
+					var pn=pnList[i];
+					var appendStr="<div class=\"item_div\">";
+						appendStr+="<input type=\"radio\" name=\"pn\" id=\"pn_rad"+pn.id+"\"/>";
+						appendStr+="<span>"+pn.name+"</span>";
+						appendStr+="</div>";
+					pnListDiv.append(appendStr);
+				}
+			}
+
+			initGPUListDiv();
+		}
+	});
+}
+
+function initGPUListDiv(){
+	$.ajax({
+		url:path+"selectGetPriceUserList",
+		dataType:"jsonp",
+		type: "post",
+		jsonpCallback:"jsonpCallback",
+		success:function(res){
+			var result=JSON.parse(res);
+			var gpuListDiv=$("#gpu_list_div");
+			gpuListDiv.empty();
+			if(result.message=="ok"){
+				var gpuList=result.data;
+				var gpuLength=gpuList.length;
+				$("#get_price_div #user_count_span").text(gpuLength);
+				for(var i=0;i<gpuLength;i++){
+					var gpu=gpuList[i];
+					var appendStr="";
+						appendStr+="<div class=\"item_div\">";
+						appendStr+="<img class=\"call_img\" src=\"image/001.png\"/>";
+						appendStr+="<div class=\"userName1_div\">"+gpu.xhUserName+"</div>";
+						appendStr+="<div class=\"phone1_div\">"+gpu.xhPhone+"</div>";
+						appendStr+="<div class=\"time_div\">"+gpu.timeAgo+"</div>";
+						appendStr+="</div>";
+					gpuListDiv.append(appendStr);
+				}
+			}
+			else{
+				$("#get_price_div #user_count_span").text(0);
+			}
+
+			initAlzsListDiv();
+		}
+	});
+}
+
+function initAlzsListDiv(){
+	$.ajax({
+		url:path+"selectExampleShowList",
+		dataType:"jsonp",
+		type: "post",
+		jsonpCallback:"jsonpCallback",
+		success:function(res){
+			var result=JSON.parse(res);
+			var alzsListDiv=$("#alzs_list_div");
+			alzsListDiv.empty();
+			if(result.message=="ok"){
+				var marginTop;
+				var marginLeft;
+				var esList=result.data;
+				for(var i=0;i<esList.length;i++){
+					if(i==0){
+						marginTop=0;
+						marginLeft=0;
+					}
+					else if(i%2==1){
+						marginTop=-130;
+						marginLeft=170;
+					}
+					else if(i%2==0){
+						marginTop=23;
+						marginLeft=0;
+					}
+					var es=esList[i];
+					var appendStr="<div class=\"item_div\" style=\"margin-top:"+marginTop+"px;margin-left:"+marginLeft+"px;\">";
+						appendStr+="<img class=\"alzs_img\" src=\"http://www.qrcodesy.com:8080"+es.imgUrl+"\"/>";
+						appendStr+="<div class=\"text_div\">"+es.name+"</div>";
+						appendStr+="</div>";
+					alzsListDiv.append(appendStr);
+				}
+			}
+
+			initSystemInfo();
+		}
+	});
+}
+
+function initSystemInfo(){
+	$.ajax({
+		url:path+"getSystemInfo",
+		dataType:"jsonp",
+		type: "post",
+		jsonpCallback:"jsonpCallback",
+		success:function(res){
+			var result=JSON.parse(res);
+			if(result.message=="ok"){
+				var systemInfo=result.systemInfo;
+				$("#xxsqyszc_div #content_div").html(systemInfo.grxxsq+"<a class=\"yszc_a\" href=\"goSecretPolicy\">《隐私政策》</a>");
+				$("#gsmc_div").text("公司名称："+systemInfo.companyName);
+				$("#lxdh1_div").text("联系电话："+systemInfo.contactTel1);
+				$("#lxdh2_div").text(systemInfo.contactTel2);
+				$("#lxdz_div").text("联系地址："+systemInfo.contactAddress);
+			}
+		}
+	});
+}
+</script>
+<title>辰麒智能门禁称重系统</title>
+</head>
+<body>
+<div class="userName_warn_bg_div" id="userName_warn_bg_div">
+	<div class="warn_div userName_warn_div">请输入姓名</div>
+</div>
+<div class="phone_warn_bg_div" id="phone_warn_bg_div">
+	<div class="warn_div phone_warn_div">请输入手机号</div>
+</div>
+<div class="pn_warn_bg_div" id="pn_warn_bg_div">
+	<div class="warn_div pn_warn_div">请选择产品需求</div>
+</div>
+<div class="agpu_warn_bg_div" id="agpu_warn_bg_div">
+	<div class="warn_div agpu_warn_div" id="agpu_warn_div"></div>
+</div>
+
+<div class="xxsqyszc_bg_div" id="xxsqyszc_bg_div">
+	<div class="xxsqyszc_div" id="xxsqyszc_div">
+		<div class="title_div">个人信息授权与隐私政策<span class="close_span" onclick="showXXSQYSZCDiv(false)">X</span></div>
+		<div class="content_div" id="content_div"></div>
+	</div>
+</div>
+
+<img class="logo_img" src="image/b91440230303c04be46f77ac31bbb390.png"/>
+<a href="tel:15712773653">
+	<div class="tel_div">
+		<img class="tel_img" src="image/202103100002.png"/>
+		<div class="text_div">电话</div>
+	</div>
+</a>
+<div class="get_price_div" id="get_price_div">
+	<div class="title_div">立即获取参考报价</div>
+	<div class="user_count_div">已有<span class="user_count_span" id="user_count_span"></span>人获取了产品价格</div>
+	<div class="userName_div">
+		<span class="userName_span">姓名</span><span class="biTian_span">*</span>
+		<div class="un_inp_div">
+			<input class="userName_inp" id="userName" type="text" placeholder="请输入姓名"/>
+		</div>
+	</div>
+	<div class="phone_div">
+		<span class="phone_span">电话</span><span class="biTian_span">*</span>
+		<div class="phone_inp_div">
+			<input class="phone_inp" id="phone" type="text" placeholder="请输入手机号"/>
+		</div>
+	</div>
+	<div class="product_need_div">
+		<div class="pn_text_span">产品需求<span class="biTian_span">*</span></div>
+		<div class="list_div" id="pn_list_div">
+		</div>
+		<div class="zdsrlsxx_div">
+			<input type="checkbox"/>
+			<span class="zdsrlsxx_span">自动输入历史信息</span>
+			<span class="xxsqyszc_span" onclick="showXXSQYSZCDiv(true)">《个人信息授权与隐私政策》</span>
+		</div>
+		<div class="get_price_but_div" onclick="checkGetPriceUserInfo()">立即获取报价</div>
+	</div>
+</div>
+<div class="gpu_list_div" id="gpu_list_div">
+</div>
+<video style="width:100%;" controls="" preload="none"  x5-playsinline="" playsinline="" webkit-playsinline="" poster="image/202011240038.png">
+	<source src="video/202011240037.mp4"></source>
+</video>
+<img class="sfhydyxnt_img" src="image/d06cdcf93c2e042fb6fe48ae989f292c.png"/>
+<img class="xtys_img" src="image/96f18448915071b9fe4d49bf318b0a6e.jpg@q_80.png"/>
+<div class="alzs_div">
+	<div class="title_div">案例展示</div>
+	<div class="desc_div">集众人智慧，聚众人合力</div>
+	<div class="list_div" id="alzs_list_div">
+	</div>
+</div>
+<div class="lxwm_div">
+	<div class="title_div">联系我们</div>
+	<div class="lxxx_div">
+		<div class="gsmc_div" id="gsmc_div"></div>
+		<div class="lxdh1_div" id="lxdh1_div"></div>
+		<div class="lxdh2_div" id="lxdh2_div"></div>
+		<div class="lxdz_div" id="lxdz_div"></div>
+	</div>
+</div>
+<div class="qdhlkjyxgs_div">青岛华凌科技有限公司</div>
+<div style="width: 100%;height: 45px;"></div>
+<div class="zxzx_div" onclick="openChatDialog()">在线咨询</div>
+</body>
+</html>
