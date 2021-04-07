@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+<html>
  <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
@@ -20,7 +20,6 @@ document.onvisibilitychange=function(){
 }
 
 $(function(){
-	gpuSmInterval=setInterval("moveGPUItemDiv()","3000");
 	initPnListDiv();
 	setTimeout("showNewBridge(false)","1000");//一开始隐藏百度商桥，等点击在线咨询后才显示。因为百度商桥是延迟加载的，必须等一秒后才隐藏
 });
@@ -84,6 +83,7 @@ function initGPUListDiv(){
 			}
 
 			initAlzsListDiv();
+			gpuSmInterval=setInterval("moveGPUItemDiv()","3000");
 		}
 	});
 }
@@ -139,7 +139,7 @@ function initSystemInfo(){
 			var result=JSON.parse(res);
 			if(result.message=="ok"){
 				var systemInfo=result.systemInfo;
-				$("#xxsqyszc_div #content_div").html(systemInfo.grxxsq+"<a class=\"yszc_a\" href=\"goSecretPolicy\">《隐私政策》</a>");
+				$("#xxsqyszc_div #content_div").html(systemInfo.grxxsq+"<a class=\"yszc_a\" href=\"secretPolicy.html\">《隐私政策》</a>");
 				$("#gsmc_div").text("公司名称："+systemInfo.companyName);
 				$("#lxdh1_div").text("联系电话："+systemInfo.contactTel1);
 				$("#lxdh2_div").text(systemInfo.contactTel2);
@@ -200,7 +200,6 @@ function addGetPriceUser(){
 		type: "post",
 		jsonpCallback:"jsonpCallback",
 		success:function(res){
-			alert(res);
 			var result=JSON.parse(res);
 			showAGPUWarnDiv(result.status==1?true:false,result.msg);
 		}
@@ -287,7 +286,7 @@ function showNewBridge(show){
 var _hmt = _hmt || [];
 (function() {
 	var hm = document.createElement('script');
-	hm.src = '//hm.baidu.com/hm.js?2d58e7ee2c6bd4eb74b0893c5a3a92a4';
+	hm.src = '//hm.baidu.com/hm.js?287448a57cda44ea7b196aa8730477a4';
 	var s = document.getElementsByTagName('script')[0];
 	s.parentNode.insertBefore(hm, s);
 })();
